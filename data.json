@@ -1,0 +1,90 @@
+[
+    {
+        "date": "24/11/2022 13:02",
+        "oldvalue": "93.00",
+        "range": "70-100",
+        "unit": "mg/dL",
+        "value": "82",
+        "name": "Glukoz"
+    },
+    {
+        "date": "24/11/2022 13:02",
+        "oldvalue": "142",
+        "range": "136-145",
+        "unit": "mmol/L",
+        "value": "142",
+        "name": "Sodyum"
+    },
+    {
+        "date": "24/11/2022 13:02",
+        "oldvalue": "4.16",
+        "range": "3.5-5.1",
+        "unit": "mmol/L",
+        "value": "4.01",
+        "name": "Potasyum"
+    },
+    {
+        "date": "02/12/2020 10:38",
+        "oldvalue": "60.00",
+        "range": "70-100",
+        "unit": "mg/dL",
+        "value": "93.00",
+        "name": "Glukoz"
+    },
+    {
+        "date": "02/12/2020 10:38",
+        "oldvalue": "140.00",
+        "range": "136-145",
+        "unit": "mmol/L",
+        "value": "141.00",
+        "name": "Sodyum"
+    },
+    {
+        "date": "02/12/2020 10:38",
+        "oldvalue": "4.40",
+        "range": "3.5-5.1",
+        "unit": "mmol/L",
+        "value": "4.42",
+        "name": "Potasyum"
+    },
+    {
+        "date": "04/02/2021 11:16",
+        "oldvalue": "141.00",
+        "range": "136-145",
+        "unit": "mmol/L",
+        "value": "142",
+        "name": "Sodyum"
+    },
+    {
+        "date": "04/02/2021 11:16",
+        "oldvalue": "4.42",
+        "range": "3.5-5.1",
+        "unit": "mmol/L",
+        "value": "4.16",
+        "name": "Potasyum"
+    },
+    {
+        "date": "23/06/2023 10:58",
+        "oldvalue": "82",
+        "range": "70-100",
+        "unit": "mg/dL",
+        "value": "80",
+        "name": "Glukoz"
+    },
+    {
+        "date": "23/06/2023 10:58",
+        "oldvalue": "142",
+        "range": "136-145",
+        "unit": "mmol/L",
+        "value": "142",
+        "name": "Sodyum"
+    },
+    {
+        "date": "23/06/2023 10:58",
+        "oldvalue": "4.01",
+        "range": "3.5-5.1",
+        "unit": "mmol/L",
+        "value": "3.98",
+        "name": "Potasyum"
+    }
+]

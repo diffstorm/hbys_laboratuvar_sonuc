@@ -1,0 +1,2 @@
+matplotlib==3.4.3
+chardet==4.0.0
