@@ -5,12 +5,23 @@
 
 :uk: Hospital E-Result Data Monitoring and Reporting Application for Turkish Probel HBYS e-hospital systems
 
-:tr: Probel tarafından tasarlanmış HBYS hastane laboratuvar sonuç alma (e-sonuç) sistemleri tarafından üretilen pdf dosyalarını analiz ederek test sonuçlarını ayıklamak ve görüntülemek amacıyla Python dilinde yazılmış bir araçtır.
+:tr: Probel tarafından tasarlanmış HBYS hastane laboratuvar sonuç alma (e-sonuç) sistemleri tarafından üretilen pdf dosyalarını analiz ederek test sonuçlarını ayıklamak ve görüntülemek amacıyla Python dilinde programlama egzersizi amacıyla yazılmış bir araçtır.
 Tüm Probel HBYS hastane sonuç alma sistemlerinin ürettiği tahlil sonuçlarıyla uyumlu çalışmaktadır.
 
-Tüm pdf dosyaları sistemden indirilerek `pdf` klasörüne kopyalandıktan sonra scriptler çalıştırılmalıdır.
+<img align="center" src="screenshot/logo.png" alt="Logo">
+
+Tüm pdf dosyaları sistemden indirilerek `pdf` klasörüne kopyalandıktan sonra scriptler sırasıyla çalıştırılmalıdır.
 - :hospital: `generate.py` : PDF dosyalarını işler, onlardan yapılandırılmış verileri çıkarır ve verileri JSON formatında `data.json` dosyasına kaydeder. PDF'den HTML'ye dönüşüm için `pdf2htmlEX` aracını kullanır ve çeşitli veri çıkarma ve temizleme işlemleri gerçekleştirir.
 - :chart_with_downwards_trend: `display.py`  : `data.json` dosyasındaki sonuç bilgilerini grafiksel olarak tarihe göre sıralanmış şekilde görüntüler.
+
+### Örnek HBYS Laboratuvar Sonuç linkleri:
+- [DOKUZ EYLÜL ÜNİVERSİTESİ HASTANESİ](https://e-hastane.deu.edu.tr/hastane/laboratuar/)
+- [İZMİR EŞREFPAŞA HASTANESİ](https://hbys.izmir.bel.tr/LABSONUC)
+- [ÖZEL EGEUMUT HASTANESİ](http://195.87.67.254/ProLabSonuc)
+- [MANİSA CELAL BAYAR ÜNİVERSİTESİ HAFSA SULTAN HASTANESİ](https://labsonuc.mcbu.edu.tr)
+- [S.B.Ü İSTANBUL EĞİTİM VE ARAŞTIRMA HASTANESİ](https://istanbuleah.istanbulsaglik.gov.tr/prolabsonuc)
+- [PAMUKKALE ÜNİVERSİTESİ HASTANELERİ](https://hbys.pau.edu.tr/ProLABSONUC/Home/Login)
+- [DİYARBAKIR DİCLE ÜNİVERSİTESİ HASTANESİ](http://hbys.dicle.edu.tr/ProLABSONUC/Home/Login)
 
 ---
 
@@ -57,7 +68,14 @@ pip install -r requirements.txt
 ```
 
 ## :floppy_disk: Sonuçların İndirilmesi (Downloading Results)
-TODO
+1. HBYS Laboratuvar Sonuçları sistemine giriş yapılır
+![Login](screenshot/login.png)
+2. Laboratuvar Sonuçları sekmesine geçilir, Rapor Al butonuna tıklanır
+![Laboratuvar Sonuçları](screenshot/labsonuc.png)
+3. Açılan pencerede indirme butonuna tıklanarak dosya 'pdf' klasörüne indirilir
+![Download](screenshot/downloadpdf.png)
+
+Tüm laboratuvar sonuçları tek tek 'pdf' klasörüne indirilmelidir.
 
 ## :syringe: Kullanım (Usage)
 TODO
