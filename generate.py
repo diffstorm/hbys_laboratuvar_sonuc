@@ -57,8 +57,8 @@ def check_directory(directory_name):
     current_directory = os.path.dirname(os.path.abspath(__file__))
     target_directory = os.path.join(current_directory, directory_name)
     if not os.path.exists(target_directory) or not os.path.isdir(target_directory):
-        print(f"'{directory_name}' does not exist.")
-        exit(1)
+        return False
+    return True
 
 def remove_directory(directory_name):
     """
@@ -101,7 +101,7 @@ def save_as_json(data, file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
             existing_data = json.load(file)
-    except FileNotFoundError:
+    except (json.JSONDecodeError, FileNotFoundError):
         existing_data = []
 
     # Create a dictionary to hold data with unique identifiers as keys
@@ -255,8 +255,12 @@ if __name__ == "__main__":
     sys.stdout.reconfigure(encoding='utf-8')
 
     # Check if directories exist
-    check_directory(exe_dir)
-    check_directory(pdf_dir)
+    if(not check_directory(exe_dir)):
+        print(f"ERROR: '{exe_dir}' folder does not exist.")
+        exit(1)
+    if(not check_directory(pdf_dir)):
+        print(f"ERROR: '{pdf_dir}' folder does not exist.")
+        exit(1)
 
     # Remove out directory if exists
     remove_directory(out_dir)

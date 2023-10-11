@@ -17,10 +17,12 @@ URL: github.com/diffstorm
 Date: 01/10/2023
 """
 
-import tkinter as tk
-from tkinter import ttk
+import os
+import sys
 import re
 import json
+import tkinter as tk
+from tkinter import ttk
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from datetime import datetime
@@ -37,10 +39,17 @@ current_index = 0  # Keep track of the current selected index
 def read_json(file_name):
     """
     Read data from a JSON file and return it as a dictionary.
+    If the file doesn't exist, return an empty dictionary.
     """
-    with open(file_name, 'r', encoding='utf-8') as json_file:
-        data = json.load(json_file)
-    return data
+    if os.path.exists(file_name):
+        try:
+            with open(file_name, 'r', encoding='utf-8') as json_file:
+                data = json.load(json_file)
+            return data
+        except (json.JSONDecodeError, FileNotFoundError):
+            return {}
+    else:
+        return {}
 
 def list_all_names(data):
     """
@@ -181,6 +190,10 @@ def on_exit():
 if __name__ == "__main__":
     # Read data from the JSON file
     data = read_json(data_file)
+    if not data:
+        print(f"ERROR: File '{data_file}' does not exist or is empty or is invalid.")
+        print("Please run generate.py first or try deleting the file if the error persists.")
+        exit(1)
 
     # Create the main window
     root = tk.Tk()
