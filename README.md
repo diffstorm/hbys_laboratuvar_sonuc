@@ -61,13 +61,19 @@ The data consists of blood-test results or similar tests in a well-known Turkish
 3. Use the combobox or arrow buttons to navigate between different data.
 
 ## 📋 Gereksinimler (Requirements)
+Cloning the repository:
+```
+git clone https://github.com/diffstorm/hbys_laboratuvar_sonuc.git
+```
+
 Before running the script, ensure you have the following requirements installed:
 - Python 3.x
 - Libraries listed in `requirements.txt`
 - `pdf2htmlEX` tool in `exe` folder (from [pdf2htmlEX GitHub](https://github.com/coolwanglu/pdf2htmlEX/wiki/Download))
 
 :uk: To install the necessary libraries, use:
-Gerekli kütüphanelerin kurulumu için aşağıdaki komut çalıştırılmalıdır:
+
+:tr: Gerekli kütüphanelerin kurulumu için aşağıdaki komut çalıştırılmalıdır:
 ```
 pip install -r requirements.txt
 ```
