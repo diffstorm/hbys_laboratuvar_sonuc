@@ -88,6 +88,8 @@ def most_common_string(strings):
     """
     Find the most common string in a list of strings.
     """
+    if not strings:
+        return ""
     string_counts = Counter(strings)
     most_common, count = string_counts.most_common(1)[0]
     return most_common
@@ -192,7 +194,7 @@ if __name__ == "__main__":
     data = read_json(data_file)
     if not data:
         print(f"ERROR: File '{data_file}' does not exist or is empty or is invalid.")
-        print("Please run generate.py first or try deleting the file if the error persists.")
+        print(f"Please run generate.py first or try deleting the '{data_file}' file if the error persists.")
         exit(1)
 
     # Create the main window

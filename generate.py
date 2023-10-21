@@ -35,6 +35,9 @@ from datetime import datetime
 # Exe directory is the folder where pdf2htmlEX is
 exe_dir = "exe"
 
+# csv directory is where the csv files are
+csv_dir = "csv"
+
 # pdf directory is where the pdf files are
 pdf_dir = "pdf"
 
@@ -51,8 +54,8 @@ def check_directory(directory_name):
     Args:
         directory_name (str): The name of the directory to check.
 
-    Raises:
-        SystemExit: Exits the script if the directory does not exist.
+    Returns:
+        bool: True if given directory exists, False otherwise.
     """
     current_directory = os.path.dirname(os.path.abspath(__file__))
     target_directory = os.path.join(current_directory, directory_name)
@@ -177,6 +180,23 @@ def fix_floating_point_numbers(text):
     pattern = r'\d+(?:,\d+)+|\d+,\d+'
     return re.sub(pattern, replace_comma_with_dot, text)
 
+def is_valid_row(data):
+    """
+    Check if a row of data meets the validity criteria.
+
+    Args:
+        data (dict): A dictionary containing data for a row.
+
+    Returns:
+        bool: True if the row is valid, False otherwise.
+    """
+    return (
+        data["date"] and
+        re.match(r'\d{2}/\d{2}/\d{4} \d{2}:\d{2}', data["date"]) and
+        re.match(r'^-?\d+\.\d*$', data["value"]) and
+        data["name"]
+    )
+
 def extract_lines_with_specified_format(text):
     """
     Extract lines with a specified format from the text.
@@ -185,46 +205,59 @@ def extract_lines_with_specified_format(text):
         text (str): The input text.
 
     Returns:
-        str: Extracted lines with the specified format.
+        str: Extracted data in json format.
     """
     pattern = r'(?m)^(\d{2}/\d{2}/\d{4} \d{2}:\d{2})\|(\d+(?:[.,]\d+)?)\|([^|]+)\|([^|]+)\|(\d+(?:[.,]\d+)?)\|([^|]*)\|(.*)$'
     datetime_lines = re.findall(pattern, text)
 
     extracted_data = []
     for date, oldvalue, range, unit, value, name, rest in datetime_lines:
-        data_dict = {
-            'date': date,
-            'oldvalue': oldvalue,
-            'range': range,
-            'unit': unit,
-            'value': value,
-            'name': name
+        data = {
+            'date': date.strip(),
+            'oldvalue': oldvalue.strip(),
+            'range': range.strip(),
+            'unit': unit.strip(),
+            'value': value.strip(),
+            'name': name.strip()
         }
-        extracted_data.append(data_dict)
-    save_as_json(extracted_data, data_file)
+        if is_valid_row(data):
+            extracted_data.append(data)
 
-    return "\n".join(f"{date}|{oldvalue}|{range}|{unit}|{value}|{name}" for date, oldvalue, range, unit, value, name, rest in datetime_lines)
+    return extracted_data
 
-def process_html_data(read_path, write_path):
+def file_read(path):
     """
-    Process data from an HTML file and save it as a text file.
+    Reads given file and returns the content
 
     Args:
-        read_path (str): The path to the input HTML file.
-        write_path (str): The path to the output text file.
+        path (str): path to the file.
+        
+    Returns:
+        str: File content
     """
     # Detect encoding
-    with open(read_path, 'rb') as file:
+    with open(path, 'rb') as file:
         raw_data = file.read()
 
     result = chardet.detect(raw_data)
     encoding = result['encoding']
 
     # Read
-    with open(read_path, 'r', encoding=encoding) as file:
+    with open(path, 'r', encoding=encoding) as file:
         content = file.read()
+    
+    return content
 
-    # Modify
+def process_html_data(content):
+    """
+    Process data from an HTML file and save it as a text file.
+
+    Args:
+        content (str): Content if the HTML file.
+
+    Returns:
+        str: Extracted data in json format.
+    """
     content = remove_attribute(content, "class")
     content = remove_attribute(content, "id")
     content = remove_attribute(content, "data-data", "'")
@@ -245,22 +278,105 @@ def process_html_data(read_path, write_path):
     content = insert_newline_before_datetime(content)
     content = extract_datetime_lines_with_text(content)
     content = fix_floating_point_numbers(content)
-    content = extract_lines_with_specified_format(content)
+    json = extract_lines_with_specified_format(content)
+    
+    return json
+    
+def csv_extract_valid_rows(csv_data):
+    """
+    Extract lines with valid date-time patterns and a single semicolon at the end.
 
-    # Write
-    with open(write_path, 'w', encoding=encoding) as file:
-        file.write(content)
+    Args:
+        csv_data (str): The input CSV data as a string.
 
-if __name__ == "__main__":
-    sys.stdout.reconfigure(encoding='utf-8')
+    Returns:
+        list: A list of lines that meet the criteria.
+    """
+    # Clean unwanted characters
+    csv_data = csv_data.replace("  ", " ").replace("  ", " ").replace(" >", ">").replace("*", "")
+    # Fix numbers
+    csv_data = fix_floating_point_numbers(csv_data)
 
-    # Check if directories exist
+    # Split the CSV data into lines
+    csv_lines = csv_data.splitlines()
+
+    # Regular expression pattern to match lines with date and a single semicolon at the end
+    pattern = r'.*;\d{2}/\d{2}/\d{4} \d{2}:\d{2};'
+
+    # Find lines that match the pattern and store them
+    valid_lines = [line for line in csv_lines if re.match(pattern, line)]
+
+    return valid_lines
+
+def csv_parse_lines(lines):
+    """
+    Parse the valid CSV lines and extract relevant data.
+
+    Args:
+        lines (list): A list of valid CSV lines.
+
+    Returns:
+        list: A list of dictionaries containing parsed data.
+    """
+    parsed_data = []
+
+    for line in lines:
+        row = line.strip().split(';')
+        data = {
+            "name": row[0].strip(),
+            "value": row[3].strip(),
+            "unit": row[4].strip(),
+            "range": row[5].strip(),
+            "oldvalue": row[7].strip(),
+            "date": row[12].strip()
+        }
+        if is_valid_row(data):
+            parsed_data.append(data)
+
+    return parsed_data
+
+def csv_process():
+    if(not check_directory(csv_dir)):
+        print(f"ERROR: '{csv_dir}' folder does not exist.")
+        return
+
+    csv_files = [file for file in os.listdir(csv_dir) if file.lower().endswith('.csv')]
+    if not csv_files:
+        print(f"No CSV files found in the {csv_dir} directory")
+        return
+
+    print("CSV files in the directory: {}".format(len(csv_files)))
+    csv_file_count = 0
+    for csv_file in csv_files:
+        csv_file_count = csv_file_count + 1
+        print(f"----- processing {csv_file} {csv_file_count}/{len(csv_files)}")
+
+        read_path = "{}/{}".format(csv_dir, csv_file)
+
+        # Read file
+        csv_data = file_read(read_path)
+
+        # Extract valid rows from the CSV data
+        content = csv_extract_valid_rows(csv_data)
+
+        # Parse the valid lines
+        json = csv_parse_lines(content)
+
+        # Store
+        save_as_json(json, data_file)
+
+        print(f"----- {csv_file} done {csv_file_count}/{len(csv_files)}", flush=True)
+    
+    print(f"All CSV files done {csv_file_count}/{len(csv_files)}")
+
+def pdf_process():
     if(not check_directory(exe_dir)):
         print(f"ERROR: '{exe_dir}' folder does not exist.")
-        exit(1)
+        return
+
     if(not check_directory(pdf_dir)):
         print(f"ERROR: '{pdf_dir}' folder does not exist.")
-        exit(1)
+        return
 
     # Remove out directory if exists
     remove_directory(out_dir)
@@ -268,7 +384,7 @@ if __name__ == "__main__":
     pdf_files = [file for file in os.listdir(pdf_dir) if file.lower().endswith('.pdf')]
     if not pdf_files:
         print(f"No PDF files found in the {pdf_dir} directory")
-        exit(1)
+        return
 
     print("PDF files in the directory: {}".format(len(pdf_files)))
     pdf_file_count = 0
@@ -282,13 +398,27 @@ if __name__ == "__main__":
 
         fname = os.path.splitext(os.path.basename(pdf_file))[0]
         read_path = "{}/{}.html".format(out_dir, fname)
-        write_path = "{}/{}.txt".format(out_dir, fname)
 
-        process_html_data(read_path, write_path)
+        # Read file
+        content = file_read(read_path)
 
+        # Modify
+        json = process_html_data(content)
+
+        # Store
+        save_as_json(json, data_file)
+        
         # Remove out directory
         remove_directory(out_dir)
 
         print(f"----- {pdf_file} done {pdf_file_count}/{len(pdf_files)}", flush=True)
     
-    print(f"All done {pdf_file_count}/{len(pdf_files)}")
+    print(f"All PDF files done {pdf_file_count}/{len(pdf_files)}")
+
+if __name__ == "__main__":
+    sys.stdout.reconfigure(encoding='utf-8')
+
+    csv_process()
+    pdf_process()
+    
+    print("Fin.")
